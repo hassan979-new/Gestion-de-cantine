@@ -1,11 +1,18 @@
 const db = require('../config/db');
+const path = require('path');
+const fs   = require('fs');
+
+const BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
+ 
+const toImageUrl = (filename) =>
+  filename ? `${BASE_URL}/api/menus/images/${filename}` : null;
 
 exports.getTodayMenus = (req, res) => {
   db.query(
-    "SELECT * FROM menus WHERE menu_date = CURDATE()",
+    "SELECT * FROM menus WHERE menu_date = CURDATE() ORDER BY id ASC",
     (err, result) => {
-      if (err) return res.status(500).json(err);
-      res.json(result);
+      if (err) return res.status(500).json({ message: "Erreur serveur." });
+      res.json(result.map(m => ({...m, image_url: toImageUrl(m.image)})));
     }
   );
 };
@@ -16,21 +23,22 @@ exports.getMenusByDate = (req, res) => {
     "SELECT * FROM menus WHERE menu_date = ? ORDER BY id ASC",
     [date],
     (err, result) => {
-      if (err) return res.status(500).json(err);
-      res.json(result);
+      if (err) return res.status(500).json({ message: "Erreur serveur." });
+      res.json(result.map(m => ({ ...m, image_url: toImageUrl(m.image) })));
     }
   );
 };
 
 exports.addMenu = (req, res) => {
   const { dish_name, price, available, menu_date } = req.body;
+  const image = req.file ? req.file.filename : null;
 
   db.query(
-    "INSERT INTO menus(dish_name,price,available,menu_date) VALUES (?,?,?,?)",
-    [dish_name, price, available, menu_date],
+    "INSERT INTO menus(dish_name,price,available,menu_date, image) VALUES (?,?,?,?,?)",
+    [dish_name.trim(), Number(price), available ?? 1, menu_date, image],
     (err, result) => {
-      if (err) return res.status(500).json(err);
-      res.json({ message: "Plat ajouté", id: result.insertId });
+      if (err) return res.status(500).json({ message: "Erreur lors de l'ajout." });
+      res.json({ message: "Plat ajouté", id: result.insertId, image_url: toImageUrl(image)});
     }
   );
 };
@@ -58,12 +66,14 @@ exports.updateMenu = (req, res) => {
 };
 
 exports.deleteMenu = (req, res) => {
-  db.query(
-    "DELETE FROM menus WHERE id=?",
-    [req.params.id],
-    (err) => {
-      if (err) return res.status(500).json(err);
-      res.json({ message: "Supprimé" });
+  db.query("SELECT image FROM menus WHERE id = ?", [req.params.id], (err, rows) => {
+    if (!err && rows[0]?.image) {
+      const filePath = path.join(__dirname, '../uploads', rows[0].image);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
-  );
+    db.query("DELETE FROM menus WHERE id = ?", [req.params.id], (err2) => {
+      if (err2) return res.status(500).json({ message: "Erreur serveur." });
+      res.json({ message: "Supprimé." });
+    });
+  });
 };

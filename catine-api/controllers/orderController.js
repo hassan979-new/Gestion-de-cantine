@@ -115,14 +115,21 @@ exports.getStats = (req, res) => {
                         (err6, revenueRes) => {
                           if (err6) return res.status(500).json(err6);
  
-                          res.json({
-                            totalOrdersToday: todayRes[0].totalOrders,
-                            statusBreakdown: statusRes,
-                            mostOrderedDish: dishRes[0]?.dish_name || 'N/A',
-                            dailyOrders: dailyRes,
-                            topDishes: topDishRes,
-                            estimatedRevenue: revenueRes[0].revenue,
-                          });
+                          db.query(
+                            "SELECT COUNT(*) as pendingOrders FROM orders WHERE status='en attente'",
+                            (err7, pendingResult)=>{
+                              if(err7) return res.status(500).json({err7});
+                              res.json({
+                                totalOrdersToday: todayRes[0].totalOrders,
+                                pendingOrders: pendingResult[0].pendingOrders,
+                                statusBreakdown: statusRes,
+                                mostOrderedDish: dishRes[0]?.dish_name || 'N/A',
+                                dailyOrders: dailyRes,
+                                topDishes: topDishRes,
+                                estimatedRevenue: revenueRes[0].revenue,
+                              });
+                            }
+                          )
                         }
                       );
                     }

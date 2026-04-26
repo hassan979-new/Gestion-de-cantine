@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import API from "../services/api";
 
@@ -149,59 +150,99 @@ export default function Orders() {
             <tbody>
               {filtered.map(o => {
                 const next  = NEXT_STATUS[o.status];
-                const final = o.status==="servie" || o.status==="annulée";
-                const isExpanded = expandedId===o.id;
+                const final = o.status === "servie" || o.status === "annulée";
+                const isExpanded = expandedId === o.id;
+
                 return (
-                  <>
-                    <tr key={o.id}>
+                  <React.Fragment key={o.id}>
+                    <tr>
                       <td style={{fontWeight:800,color:"var(--purple)"}}>#{o.id}</td>
+
                       <td>
-                        <div style={{fontWeight:600}}>{o.student_name || `Étudiant #${o.user_id}`}</div>
-                        <div style={{fontSize:11,color:"var(--text-muted)"}}>ID: {o.user_id}</div>
+                        <div style={{fontWeight:600}}>
+                          {o.student_name || `Étudiant #${o.user_id}`}
+                        </div>
+                        <div style={{fontSize:11,color:"var(--text-muted)"}}>
+                          ID: {o.user_id}
+                        </div>
                       </td>
-                      <td style={{color:"var(--text-muted)",fontSize:13}}>{fmt(o.created_at)}</td>
+
+                      <td style={{color:"var(--text-muted)",fontSize:13}}>
+                        {fmt(o.created_at)}
+                      </td>
+
                       <td>
-                        <button className="btn btn-sm btn-outline" onClick={()=>loadItems(o.id)}>
-                          {o.item_count} plat{o.item_count!==1?"s":""} {isExpanded?"▲":"▼"}
+                        <button
+                          className="btn btn-sm btn-outline"
+                          onClick={() => loadItems(o.id)}
+                        >
+                          {o.item_count} plat{o.item_count !== 1 ? "s" : ""}{" "}
+                          {isExpanded ? "▲" : "▼"}
                         </button>
                       </td>
-                      <td style={{fontWeight:700}}>{o.total ? Number(o.total).toFixed(2)+" DH" : "—"}</td>
-                      <td><span className={`badge ${getBadge(o.status)}`}>{o.status}</span></td>
+
+                      <td style={{fontWeight:700}}>
+                        {o.total ? Number(o.total).toFixed(2) + " DH" : "—"}
+                      </td>
+
+                      <td>
+                        <span className={`badge ${getBadge(o.status)}`}>
+                          {o.status}
+                        </span>
+                      </td>
+
                       <td>
                         {!final && next ? (
                           <div style={{display:"flex",gap:6}}>
-                            <button className="btn btn-sm btn-primary" onClick={()=>changeStatus(o.id,next)}>
+                            <button
+                              className="btn btn-sm btn-primary"
+                              onClick={() => changeStatus(o.id, next)}
+                            >
                               → {next}
                             </button>
-                            <button className="btn btn-sm btn-danger" onClick={()=>changeStatus(o.id,"annulée")}>
+
+                            <button
+                              className="btn btn-sm btn-danger"
+                              onClick={() => changeStatus(o.id, "annulée")}
+                            >
                               Annuler
                             </button>
                           </div>
                         ) : (
-                          <span style={{color:"var(--text-muted)",fontSize:12}}>Finalisée</span>
+                          <span style={{color:"var(--text-muted)",fontSize:12}}>
+                            Finalisée
+                          </span>
                         )}
                       </td>
                     </tr>
+
+                    {/* Expanded row */}
                     {isExpanded && itemsMap[o.id] && (
-                      <tr key={`exp-${o.id}`}>
-                        <td colSpan={7} style={{background:"#f8f9fa",padding:"0 16px 12px 32px"}}>
-                          <div style={{fontSize:12,color:"var(--text-muted)",marginBottom:4,marginTop:8}}>Détail des plats :</div>
-                          <table style={{width:"100%",fontSize:12,borderCollapse:"collapse"}}>
+                      <tr>
+                        <td colSpan={7} style={{background:"#f8f9fa",padding:"12px 16px"}}>
+                          <div style={{fontSize:12,color:"var(--text-muted)",marginBottom:6}}>
+                            Détail des plats :
+                          </div>
+
+                          <table style={{width:"100%",fontSize:12}}>
                             <thead>
                               <tr>
-                                <th style={{textAlign:"left",padding:"4px 8px",color:"var(--text-muted)",fontWeight:600}}>Plat</th>
-                                <th style={{textAlign:"right",padding:"4px 8px",color:"var(--text-muted)",fontWeight:600}}>Qté</th>
-                                <th style={{textAlign:"right",padding:"4px 8px",color:"var(--text-muted)",fontWeight:600}}>Prix unit.</th>
-                                <th style={{textAlign:"right",padding:"4px 8px",color:"var(--text-muted)",fontWeight:600}}>Sous-total</th>
+                                <th>Plat</th>
+                                <th style={{textAlign:"right"}}>Qté</th>
+                                <th style={{textAlign:"right"}}>Prix</th>
+                                <th style={{textAlign:"right"}}>Total</th>
                               </tr>
                             </thead>
+
                             <tbody>
                               {itemsMap[o.id].map(item => (
                                 <tr key={item.id}>
-                                  <td style={{padding:"4px 8px"}}>{item.dish_name}</td>
-                                  <td style={{textAlign:"right",padding:"4px 8px"}}>{item.quantity}</td>
-                                  <td style={{textAlign:"right",padding:"4px 8px"}}>{item.price} DH</td>
-                                  <td style={{textAlign:"right",padding:"4px 8px",fontWeight:600}}>{Number(item.subtotal).toFixed(2)} DH</td>
+                                  <td>{item.dish_name}</td>
+                                  <td style={{textAlign:"right"}}>{item.quantity}</td>
+                                  <td style={{textAlign:"right"}}>{item.price} DH</td>
+                                  <td style={{textAlign:"right",fontWeight:600}}>
+                                    {Number(item.subtotal).toFixed(2)} DH
+                                  </td>
                                 </tr>
                               ))}
                             </tbody>
@@ -209,7 +250,7 @@ export default function Orders() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 );
               })}
             </tbody>

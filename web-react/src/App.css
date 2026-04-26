@@ -793,3 +793,92 @@ a { text-decoration: none; color: inherit; }
   from { transform: translateY(20px); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
 }
+
+/* AUTH PAGES */
+.auth-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #7928CA 0%, #1a1a2e 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-wrapper {
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+}
+
+.auth-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+  margin: auto;
+}
+
+.auth-logo {
+  text-align: center;
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.auth-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.auth-sub {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+
+/* SIDEBAR USER CHIP */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f8f9fa;
+  margin-bottom: 4px;
+}
+
+.sidebar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), var(--purple-light));
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* PASSWORD STRENGTH */
+.strength-bar {
+  height: 4px;
+  border-radius: 4px;
+  background: #e9ecef;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+/* MENU CARD IMAGE OVERLAY on hover */
+.menu-card-img {
+  position: relative;
+}
+
+.menu-card-img:hover .img-overlay { opacity: 1 !important; }

@@ -1,5 +1,8 @@
-import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login    from "./pages/Login";
+import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Menus    from "./pages/Menus";
 import Orders   from "./pages/Orders";
@@ -20,9 +23,21 @@ function Icon({ d }) {
   );
 }
 
+// Route guard — redirect to /login if not authenticated
+function Protected() {
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+
+  return user ? <Outlet /> : <Navigate to="/login" replace />;
+}
+
 function Sidebar() {
   const location = useLocation();
-  if (location.pathname === "/login") return null;
+  const { user }  = useAuth();
+  const isAuth    = location.pathname === "/login" || location.pathname === "/register";
+  if (isAuth) return null;
+
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -33,7 +48,7 @@ function Sidebar() {
       <nav className="sidebar-nav">
         {NAV.map(n => (
           <Link key={n.path} to={n.path}
-            className={`nav-item ${location.pathname===n.path?"active":""}`}>
+            className={`nav-item ${location.pathname === n.path ? "active" : ""}`}>
             <span className="nav-icon-wrap"><Icon d={n.icon}/></span>
             {n.label}
           </Link>
@@ -41,27 +56,32 @@ function Sidebar() {
       </nav>
       <hr className="sidebar-divider"/>
       <div className="sidebar-section-label">COMPTE</div>
-      <nav className="sidebar-nav">
-        <Link to="/login" className="nav-item">
-          <span className="nav-icon-wrap">
-            <Icon d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-          </span>
-          Connexion
-        </Link>
-      </nav>
+      <div className="sidebar-user">
+        <div className="sidebar-avatar">{user?.name?.[0]?.toUpperCase() || "?"}</div>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:13,fontWeight:700,color:"var(--text)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user?.name}</div>
+          <div style={{fontSize:11,color:"var(--text-muted)",textTransform:"capitalize"}}>{user?.role}</div>
+        </div>
+      </div>
       <div className="sidebar-promo">
         <div className="sidebar-promo-title">Cantine ENS Marrakech</div>
-        <p className="sidebar-promo-desc">Gérez vos menus et commandes depuis ce tableau de bord.</p>
+        <p className="sidebar-promo-desc">Gérez vos menus et commandes facilement.</p>
       </div>
     </aside>
   );
 }
 
 function Topbar() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  if (location.pathname === "/login") return null;
+  const location  = useLocation();
+  const navigate  = useNavigate();
+  const { logout } = useAuth();
+  const isAuth    = location.pathname === "/login" || location.pathname === "/register";
+  if (isAuth) return null;
+
   const current = NAV.find(n => n.path === location.pathname);
+
+  const handleLogout = () => { logout(); navigate("/login"); };
+
   return (
     <header className="topbar">
       <div className="topbar-breadcrumb">
@@ -70,36 +90,53 @@ function Topbar() {
         <span className="breadcrumb-current">{current?.label || "Dashboard"}</span>
       </div>
       <div className="topbar-right">
-        <input className="topbar-search" placeholder="Rechercher…" readOnly/>
-        <button className="topbar-btn" onClick={() => { localStorage.removeItem("token"); navigate("/login"); }}>
-          Déconnexion
-        </button>
+        <button className="topbar-btn" onClick={handleLogout}>Déconnexion</button>
       </div>
     </header>
   );
 }
 
-function Shell() {
-  const location = useLocation();
-  const isLogin  = location.pathname === "/login";
+
+function PrivateLayout() {
   return (
     <div className="app-shell">
-      <Sidebar/>
-      <div className={isLogin ? "" : "main-wrapper"}>
-        <Topbar/>
-        <main className={isLogin ? "" : "main-content"}>
-          <Routes>
-            <Route path="/login"  element={<Login/>}/>
-            <Route path="/"       element={<Dashboard/>}/>
-            <Route path="/menus"  element={<Menus/>}/>
-            <Route path="/orders" element={<Orders/>}/>
-          </Routes>
+      <Sidebar />
+      <div className="main-wrapper">
+        <Topbar />
+        <main className="main-content">
+          <Outlet />
         </main>
       </div>
     </div>
   );
 }
 
+
+
 export default function App() {
-  return <BrowserRouter><Shell/></BrowserRouter>;
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+
+          {/* Public routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Protected layout */}
+          <Route element={<Protected />}>
+            <Route element={<PrivateLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/menus" element={<Menus />} />
+              <Route path="/orders" element={<Orders />} />
+            </Route>
+          </Route>
+
+          {/* fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
 }

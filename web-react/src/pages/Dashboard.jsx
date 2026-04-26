@@ -83,7 +83,19 @@ export default function Dashboard() {
           </div>
           <div className="stat-icon red">📦</div>
         </div>
+        {/* ── Pending card ── */}
+        <div className="stat-card">
+          <div className="stat-info">
+            <div className="stat-label">Pending Orders</div>
+            <div className="stat-value">
+              {stats.pendingOrders}
+            </div>
+          </div>
+          <div className="stat-icon red">⏰</div>
+        </div>
       </div>
+
+      
 
       {/* ── Charts Row 1 ── */}
       <div className="two-col" style={{marginBottom:20}}>
