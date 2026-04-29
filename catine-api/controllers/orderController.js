@@ -30,9 +30,32 @@ exports.createOrder = (req, res) => {
 };
 
 exports.getOrders = (req, res) => {
-  db.query("SELECT * FROM orders", (err, result) => {
+  db.query("SELECT * FROM orders", (err, orders) => {
     if (err) return res.status(500).json(err);
-    res.json(result);
+
+    let completed = 0;
+
+    orders.forEach((order, index) => {
+      db.query(
+        `SELECT oi.*, m.dish_name
+         FROM order_items oi
+         JOIN menus m ON oi.menu_id = m.id
+         WHERE oi.order_id = ?`,
+        [order.id],
+        (err2, items) => {
+
+          orders[index].items = items;
+
+          completed++;
+
+          if (completed === orders.length) {
+            res.json(orders);
+          }
+        }
+      );
+    });
+
+    if (orders.length === 0) res.json([]);
   });
 };
 
@@ -85,7 +108,7 @@ exports.getStats = (req, res) => {
             (err3, dishRes) => {
               if (err3) return res.status(500).json(err3);
  
-              // daily orders last 7 days
+
               db.query(
                 `SELECT DATE_FORMAT(created_at, '%d/%m') AS day, COUNT(*) AS count
                  FROM orders
@@ -95,7 +118,6 @@ exports.getStats = (req, res) => {
                 (err4, dailyRes) => {
                   if (err4) return res.status(500).json(err4);
  
-                  // top 5 dishes
                   db.query(
                     `SELECT m.dish_name, SUM(oi.quantity) AS total
                      FROM order_items oi
@@ -106,7 +128,6 @@ exports.getStats = (req, res) => {
                     (err5, topDishRes) => {
                       if (err5) return res.status(500).json(err5);
  
-                      // estimated revenue today
                       db.query(
                         `SELECT COALESCE(SUM(oi.subtotal), 0) AS revenue
                          FROM orders o
@@ -143,3 +164,39 @@ exports.getStats = (req, res) => {
     }
   );
 }
+
+  exports.updateStatusAndroid = (req, res) => {
+
+  const { status } = req.body;
+
+  const allowed = ["en_attente", "en_preparation", "prete", "servie", "annulee"];
+
+  if (!allowed.includes(status)) {
+    return res.status(400).json({ message: "Statut invalide" });
+  }
+
+  if (status === "annulee") {
+    db.query(
+      "UPDATE orders SET status=? WHERE id=? AND status!='servie'",
+      [status, req.params.id],
+      (err, result) => {
+        if (err) return res.status(500).json(err);
+
+        if (result.affectedRows === 0) {
+          return res.status(400).json({ message: "Impossible d'annuler" });
+        }
+
+        res.json({ message: "Commande annulée" });
+      }
+    );
+  } else {
+    db.query(
+      "UPDATE orders SET status=? WHERE id=?",
+      [status, req.params.id],
+      (err) => {
+        if (err) return res.status(500).json(err);
+        res.json({ message: "Statut mis à jour" });
+      }
+    );
+  }
+};

@@ -31,7 +31,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
-            android:text="ENS Cantine"
+            android:text="Créer un compte"
             android:textSize="30sp"
             android:textStyle="bold"
             android:textColor="#1C1108"
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"/>
 
         <TextView
-            android:text="Connectez-vous à votre compte"
+            android:text="Rejoignez ENS Cantine"
             android:textSize="14sp"
             android:textColor="#8B7355"
             android:layout_marginTop="6dp"
@@ -73,7 +73,7 @@
                     app:boxStrokeColor="#E0D5C5">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/emailInput"
+                        android:id="@+id/registerEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textEmailAddress"/>
@@ -94,7 +94,28 @@
                     app:endIconMode="password_toggle">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/passwordInput"
+                        android:id="@+id/registerPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Confirmer le mot de passe"
+                    app:boxCornerRadiusTopStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxStrokeColor="#E0D5C5"
+                    app:endIconMode="password_toggle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/registerPasswordConfirm"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"/>
@@ -102,17 +123,17 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/loginBtn"
+                    android:id="@+id/registerBtn"
                     android:layout_marginTop="28dp"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="Se connecter"
+                    android:text="Créer mon compte"
                     android:textSize="16sp"
                     android:textColor="#F5E6C8"
                     app:backgroundTint="#2C1810"
                     app:cornerRadius="16dp"/>
 
-                <!-- regitre -->
+                <!-- LOGIN -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:gravity="center"
@@ -121,15 +142,15 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:text="Pas encore de compte ? "
+                        android:text="Déjà un compte ? "
                         android:textSize="14sp"
                         android:textColor="#8B7355"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:id="@+id/goToRegister"
-                        android:text="S'inscrire"
+                        android:id="@+id/goToLogin"
+                        android:text="Se connecter"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:textColor="#2C1810"
@@ -139,8 +160,6 @@
                 </LinearLayout>
 
             </LinearLayout>
-
-
 
         </com.google.android.material.card.MaterialCardView>
 

@@ -19,7 +19,7 @@ function ImagePicker({ value, onChange }) {
   return (
     <div
       style={{
-        position: "relative",   // ✅ IMPORTANT FIX
+        position: "relative",
         width: "100%",
         height: 140,
         borderRadius: 10,
@@ -36,7 +36,6 @@ function ImagePicker({ value, onChange }) {
       }}
       onClick={() => inputRef.current.click()}
     >
-      {/* Placeholder when no image */}
       {!preview && (
         <div style={{ textAlign: "center", color: "var(--text-muted)" }}>
           <div style={{ fontSize: 32, marginBottom: 6 }}>📷</div>
@@ -47,7 +46,6 @@ function ImagePicker({ value, onChange }) {
         </div>
       )}
 
-      {/* Hidden file input */}
       <input
         ref={inputRef}
         type="file"
@@ -63,14 +61,21 @@ export default function Menus() {
   const { user } = useAuth();
   const canEdit  = user?.role === "agent" || user?.role === "admin";
 
+  const getLocalDate = () => {
+    const d = new Date();
+    const offset = d.getTimezoneOffset();
+    const local = new Date(d.getTime() - offset * 60000);
+    return local.toISOString().split("T")[0];
+  };
+
   const [menus,     setMenus]     = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [saving,    setSaving]    = useState(false);
   const [toast,     setToast]     = useState(null);
-  const [viewDate,  setViewDate]  = useState(new Date().toISOString().split("T")[0]);
-  const [form,      setForm]      = useState({ dish_name:"", price:"", menu_date: new Date().toISOString().split("T")[0] });
+  const [viewDate,  setViewDate]  = useState(getLocalDate());
+  const [form,      setForm]      = useState({ dish_name:"", price:"", menu_date: getLocalDate() });
   const [imageFile, setImageFile] = useState(null);
 
   const showToast = (msg, type="success") => { setToast({msg,type}); setTimeout(()=>setToast(null),3000); };
@@ -83,12 +88,9 @@ export default function Menus() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(viewDate); }, [viewDate]);
-
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    setViewDate(today);
-  }, []);
+    load(viewDate);
+  }, [viewDate]);
 
   const openModal = () => {
     setForm({ dish_name:"", price:"", menu_date:viewDate });
@@ -135,7 +137,7 @@ export default function Menus() {
     } catch (err) { showToast(err.response?.data?.message || "Erreur.", "error"); }
   };
 
-  const isToday = viewDate === new Date().toISOString().split("T")[0];
+  const isToday = viewDate === getLocalDate();
 
   return (
     <div>
@@ -212,7 +214,6 @@ export default function Menus() {
         </div>
       )}
 
-      {/* Add Modal */}
       {showModal && (
         <div
           className="modal-overlay"

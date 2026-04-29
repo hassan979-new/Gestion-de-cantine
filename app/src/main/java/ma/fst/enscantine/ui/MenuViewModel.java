@@ -16,11 +16,9 @@ public class MenuViewModel extends AndroidViewModel {
     private MutableLiveData<List<Menu>> menus = new MutableLiveData<>();
     private MenuRepository repo;
 
-    public MenuViewModel(Application application) {
-        super(application);
-
-        SessionManager sessionManager = new SessionManager(application);
-        repo = new MenuRepository(sessionManager);
+    public MenuViewModel(Application app) {
+        super(app);
+        repo = new MenuRepository(new SessionManager(app));
     }
 
     public MutableLiveData<List<Menu>> getMenus() {
@@ -30,4 +28,27 @@ public class MenuViewModel extends AndroidViewModel {
     public void loadMenus() {
         repo.getTodayMenus(menus);
     }
+
+    public MutableLiveData<String> createOrder(int userId, int menuId, int qty) {
+
+        MutableLiveData<String> result = new MutableLiveData<>();
+
+        List<Menu> currentMenus = menus.getValue();
+
+        if (currentMenus == null) {
+            result.setValue("Menus non chargés");
+            return result;
+        }
+
+        for (Menu m : currentMenus) {
+            if (m.id == menuId) {
+                return repo.createOrder(userId, m, qty);
+            }
+        }
+
+        result.setValue("Menu introuvable");
+        return result;
+    }
+
+
 }

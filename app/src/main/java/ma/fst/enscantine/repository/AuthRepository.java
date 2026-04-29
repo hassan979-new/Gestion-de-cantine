@@ -35,4 +35,18 @@ public class AuthRepository {
                     }
                 });
     }
+
+    public void register(String email, String password, MutableLiveData<LoginResponse> result) {
+        api.register(new LoginRequest(email, password))
+                .enqueue(new Callback<LoginResponse>() {
+                    @Override
+                    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                        result.setValue(response.body());
+                    }
+                    @Override
+                    public void onFailure(Call<LoginResponse> call, Throwable t) {
+                        result.setValue(null);
+                    }
+                });
+    }
 }

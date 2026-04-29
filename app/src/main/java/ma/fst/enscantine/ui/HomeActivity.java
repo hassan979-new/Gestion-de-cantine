@@ -1,23 +1,20 @@
 package ma.fst.enscantine.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import com.google.android.material.button.MaterialButton;
+
 import java.util.List;
 
 import ma.fst.enscantine.R;
-import ma.fst.enscantine.adapter.MenuAdapter;
 import ma.fst.enscantine.api.ApiClient;
 import ma.fst.enscantine.api.ApiService;
 import ma.fst.enscantine.entities.Menu;
-import ma.fst.enscantine.entities.OrderRequest;
-import ma.fst.enscantine.entities.OrderResponse;
-
 import ma.fst.enscantine.session.SessionManager;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,87 +22,88 @@ import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
 
-    RecyclerView recyclerView;
-    MenuAdapter adapter;
+    private TextView txtMenuPreview;
+    private MaterialButton btnViewMenu;
+    private com.google.android.material.card.MaterialCardView btnOrders, btnProfile;
 
-    ApiService api;
-
-    List<Menu> menuList = new ArrayList<>();
+    private ApiService api;
+    private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        recyclerView = findViewById(R.id.recyclerMenus);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        session = new SessionManager(this);
 
-        SessionManager session = new SessionManager(this);
+        if (session.getToken() == null) {
+            goToLogin();
+            return;
+        }
+
+        txtMenuPreview = findViewById(R.id.txtMenuPreview);
+        btnViewMenu = findViewById(R.id.btnViewMenu);
+        btnOrders = findViewById(R.id.btnOrders);
+
+        btnProfile = findViewById(R.id.btnProfile);
+
 
         api = ApiClient.getClient(session).create(ApiService.class);
 
-        loadMenus();
+        loadMenuPreview();
+
+        btnViewMenu.setOnClickListener(v -> {
+            startActivity(new Intent(this, MenuActivity.class));
+        });
+
+        btnOrders.setOnClickListener(v -> {
+            startActivity(new Intent(this, OrdersActivity.class));
+        });
+
+        btnProfile.setOnClickListener(v ->
+                startActivity(new Intent(this, ProfileActivity.class))
+        );
     }
 
-    private void loadMenus() {
-
+    private void loadMenuPreview() {
         api.getTodayMenus().enqueue(new Callback<List<Menu>>() {
             @Override
             public void onResponse(Call<List<Menu>> call, Response<List<Menu>> response) {
-
                 if (response.isSuccessful() && response.body() != null) {
+                    List<Menu> menus = response.body();
 
-                    menuList = response.body();
+                    if (menus.isEmpty()) {
+                        txtMenuPreview.setText("Aucun menu aujourd'hui");
+                        return;
+                    }
 
-                    adapter = new MenuAdapter(menuList, menu -> {
-                        createOrder(menu);
-                    });
+                    StringBuilder preview = new StringBuilder();
 
-                    recyclerView.setAdapter(adapter);
+                    for (int i = 0; i < Math.min(2, menus.size()); i++) {
+                        preview.append("• ")
+                                .append(menus.get(i).name)
+                                .append("\n");
+                    }
 
+                    txtMenuPreview.setText(preview.toString());
+
+                } else if (response.code() == 401) {
+                    session.clear();
+                    goToLogin();
                 } else {
-                    Toast.makeText(HomeActivity.this,
-                            "No menu available",
-                            Toast.LENGTH_SHORT).show();
+                    txtMenuPreview.setText("Erreur chargement menu");
                 }
             }
 
             @Override
             public void onFailure(Call<List<Menu>> call, Throwable t) {
-                Toast.makeText(HomeActivity.this,
-                        "Error loading menu",
-                        Toast.LENGTH_SHORT).show();
+                txtMenuPreview.setText("Erreur réseau");
             }
         });
     }
 
-    private void createOrder(Menu menu) {
-
-        OrderRequest request = new OrderRequest(menu.id, 1);
-
-        api.createOrder(request).enqueue(new Callback<OrderResponse>() {
-            @Override
-            public void onResponse(Call<OrderResponse> call, Response<OrderResponse> response) {
-
-                if (response.isSuccessful() && response.body() != null) {
-
-                    Toast.makeText(HomeActivity.this,
-                            "Order placed",
-                            Toast.LENGTH_SHORT).show();
-
-                } else {
-                    Toast.makeText(HomeActivity.this,
-                            "Order failed",
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<OrderResponse> call, Throwable t) {
-                Toast.makeText(HomeActivity.this,
-                        "Network error",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void goToLogin() {
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
     }
 }

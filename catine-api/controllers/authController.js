@@ -19,7 +19,7 @@ exports.register = (req, res) => {
         return res.status(400).json({ message: "Adresse email invalide." });
 
     const allowedRoles = ['agent'];
-    const userRole = allowedRoles.includes(role) ? role : 'agent';
+    const userRole = allowedRoles.includes(role) ? role : 'student';
 
     db.query(
         "SELECT id FROM users WHERE email = ?",
