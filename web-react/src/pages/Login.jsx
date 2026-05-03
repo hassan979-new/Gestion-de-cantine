@@ -49,7 +49,7 @@ export default function Login() {
             <button type="button" onClick={() => setShowPwd(v => !v)}
               style={{ position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",
                 background:"none",border:"none",cursor:"pointer",fontSize:16,color:"var(--text-muted)" }}>
-              {showPwd ? "🙈" : "👁"}
+              {showPwd ? "X" : "👁"}
             </button>
           </div>
         </div>

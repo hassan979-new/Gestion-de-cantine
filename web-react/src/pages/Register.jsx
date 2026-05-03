@@ -26,7 +26,7 @@ export default function Register() {
     if (err) { setError(err); return; }
     setLoading(true); setError(null);
     try {
-      await register(form.name.trim(), form.email.trim(), form.password, form.role);
+      await register(form.name.trim(), form.email.trim(), form.password, "agent");
       navigate("/");
     } catch (e) {
       setError(e.response?.data?.message || "Erreur lors de la création du compte.");
@@ -62,13 +62,6 @@ export default function Register() {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Type de compte</label>
-          <select className="form-select" value={form.role} onChange={set("role")}>
-            <option value="agent">Agent Cantine</option>
-          </select>
-        </div>
-
-        <div className="form-group">
           <label className="form-label">Mot de passe *</label>
           <div style={{ position:"relative" }}>
             <input className="form-input" type={showPwd ? "text" : "password"}
@@ -77,7 +70,7 @@ export default function Register() {
             <button type="button" onClick={() => setShowPwd(v=>!v)}
               style={{ position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",
                 background:"none",border:"none",cursor:"pointer",fontSize:16,color:"var(--text-muted)" }}>
-              {showPwd ? "🙈" : "👁"}
+              {showPwd ? "X" : "👁"}
             </button>
           </div>
           {form.password && (

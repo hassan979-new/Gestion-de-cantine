@@ -15,7 +15,6 @@ export function AuthProvider({ children }) {
     API.get("/auth/me")
       .then(res => setUser(res.data))
       .catch(() => {
-        // Token invalid/supprimer le
         localStorage.removeItem("token");
       })
       .finally(() => setLoading(false));

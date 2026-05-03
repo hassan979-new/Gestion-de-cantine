@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- HEADER -->
         <TextView
             android:text="Bonjour 👋"
             android:textSize="32sp"
@@ -30,7 +29,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-        <!-- DARK MENU CARD -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -84,7 +82,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- SERVICES TITLE -->
         <TextView
             android:text="Services"
             android:textStyle="bold"
@@ -95,7 +92,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-        <!-- SERVICE BUTTONS ROW -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"

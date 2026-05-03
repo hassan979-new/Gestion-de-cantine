@@ -7,7 +7,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <!-- DARK HEADER -->
     <LinearLayout
         android:orientation="vertical"
         android:background="#2C1810"
@@ -43,7 +42,6 @@
 
     </LinearLayout>
 
-    <!-- BODY -->
     <LinearLayout
         android:orientation="vertical"
         android:padding="24dp"
@@ -58,7 +56,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-        <!-- QUANTITY STEPPER -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="wrap_content"
@@ -97,7 +94,6 @@
 
         </LinearLayout>
 
-        <!-- DIVIDER -->
         <View
             android:layout_marginTop="20dp"
             android:layout_marginBottom="16dp"
@@ -105,7 +101,6 @@
             android:layout_height="1dp"
             android:background="#F0E8D8"/>
 
-        <!-- TOTAL -->
         <LinearLayout
             android:orientation="horizontal"
             android:gravity="center_vertical"
